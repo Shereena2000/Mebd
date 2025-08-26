@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:medb/Settings/utils/p_text_styles.dart';
-import '../../Settings/constants/text_styles.dart';
 import '../../Settings/utils/p_colors.dart';
 
 class AuthNavigationText extends StatelessWidget {
@@ -26,7 +25,7 @@ class AuthNavigationText extends StatelessWidget {
           onTap: onTap,
           child: Text(
             buttonText,
-            style: PTextStyles.bodyMedium.copyWith(color: PColors.primaryColor),
+            style: PTextStyles.bodyMedium.copyWith(color: PColors.primaryColor,fontWeight: FontWeight.w600),
           ),
         ),
       ],

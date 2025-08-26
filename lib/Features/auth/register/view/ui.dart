@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medb/Settings/utils/p_pages.dart';
 import '../../../../Settings/common/custom_outline_button.dart';
 import '../../../../Settings/common/custom_text_feild.dart';
 import '../../../../Settings/constants/sized_box.dart';
@@ -21,9 +22,10 @@ class RegisterScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                       SizeBoxH(30),
                     SizedBox(height: 40, child: Image.asset(Images.logo)),SizeBoxH(20),
                     Text("Create an Account", style: PTextStyles.displaMedium),
-                    SizeBoxH(50),
+                    SizeBoxH(30),
                     CustomTextFeild(hintText: "First Name"),
                     Row(
                       children: [
@@ -52,9 +54,11 @@ class RegisterScreen extends StatelessWidget {
                   CustomOutlineButton(onPressed: () {}, text: 'Register'),
                   SizeBoxH(10),
                   AuthNavigationText(
-                    text: "Already have an account?",
+                    text: "Already have an account? ",
                     buttonText: "Login",
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, PPages.login);
+                    },
                   ),
                 ],
               ),

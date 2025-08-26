@@ -76,7 +76,7 @@ class _CustomTextFeildState extends State<CustomTextFeild> {
           : null,
       border: InputBorder.none,
       contentPadding: EdgeInsets.symmetric(
-        vertical: widget.contentPadVertical ?? 11,
+        vertical: widget.contentPadVertical ?? 15,
         horizontal: 12,
       ),
       filled: true,
