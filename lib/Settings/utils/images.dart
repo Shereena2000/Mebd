@@ -1,3 +1,3 @@
 class Images {
-  static String get logo => 'assets/images/medb_logo.png';
+  static String get logo => 'assets/images/logo_medb.png';
 }

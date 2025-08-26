@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medb/Features/auth/register/view/ui.dart';
 import 'package:medb/Features/home/view/ui.dart';
 import 'package:medb/Settings/utils/p_pages.dart';
 
@@ -9,6 +10,9 @@ class Routes {
     switch (settings.name) {
       case PPages.splash:
         return MaterialPageRoute(builder: (context) => SplashScreen());
+
+                 case PPages.registerPageUi:
+        return MaterialPageRoute(builder: (context) => RegisterScreen());
               case PPages.homePageUi:
         return MaterialPageRoute(builder: (context) => HomeScreen());
       // case PPages.noInternet:
