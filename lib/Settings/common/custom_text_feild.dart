@@ -9,7 +9,6 @@ class CustomTextFeild extends StatefulWidget {
   final String hintText;
   final Color? filColor;
   final Color? hintColor;
-
   final Color? textColor;
   final Color? borderColor;
   final int? maxLine;
@@ -24,7 +23,6 @@ class CustomTextFeild extends StatefulWidget {
   final Function()? onTap;
   final Function(String? val)? onSaved;
   final Function(String? val)? onSubmitted;
-
   final Function(String? val)? onChanged;
   final Iterable<String>? autofillHints;
   final TextEditingController? controller;
@@ -32,6 +30,8 @@ class CustomTextFeild extends StatefulWidget {
   final String? Function(String? val)? validation;
   final TextInputType? keyboardType;
   final bool readOnly;
+  final bool obscureText; // Added this parameter
+
   const CustomTextFeild({
     super.key,
     this.onTap,
@@ -59,6 +59,7 @@ class CustomTextFeild extends StatefulWidget {
     this.borderRadius,
     this.borderColor,
     this.readOnly = false,
+    this.obscureText = false, // Added with default value
   });
 
   @override
@@ -129,6 +130,7 @@ class _CustomTextFeildState extends State<CustomTextFeild> {
           height: 60,
           child: TextFormField(
             readOnly: widget.readOnly,
+            obscureText: widget.obscureText, // Added this line
             onTap: widget.onTap,
             onFieldSubmitted: widget.onSubmitted,
             focusNode: widget.focusNode,

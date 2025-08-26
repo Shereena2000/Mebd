@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'Settings/helper/providers.dart';
 import 'Settings/utils/p_colors.dart';
 import 'Settings/utils/p_pages.dart';
 import 'Settings/utils/p_routes.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: providers, child: const MyApp()));
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -19,13 +21,13 @@ class MyApp extends StatelessWidget {
       title: 'Medb',
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-           theme: ThemeData(
+      theme: ThemeData(
         brightness: Brightness.light,
         highlightColor: Colors.transparent,
         splashColor: Colors.transparent,
         scaffoldBackgroundColor: PColors.colorFFFFFF,
         colorScheme: ColorScheme.fromSeed(seedColor: PColors.primaryColor),
-        iconTheme: IconThemeData(color: PColors.colorFFFFFF),
+        iconTheme: IconThemeData(color: PColors.lightGrey),
         useMaterial3: true,
         appBarTheme: AppBarTheme(
           backgroundColor: PColors.colorFFFFFF,
@@ -34,7 +36,7 @@ class MyApp extends StatelessWidget {
           centerTitle: true,
         ),
       ),
-        initialRoute: PPages.splash,
+      initialRoute: PPages.splash,
       onGenerateRoute: Routes.genericRoute,
     );
   }
