@@ -1,0 +1,21 @@
+import 'package:flutter/material.dart';
+import 'package:medb/Features/home/view/ui.dart';
+import 'package:medb/Settings/utils/p_pages.dart';
+
+import '../../Features/splash/view/ui.dart';
+
+class Routes {
+  static Route<dynamic>? genericRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case PPages.splash:
+        return MaterialPageRoute(builder: (context) => SplashScreen());
+              case PPages.homePageUi:
+        return MaterialPageRoute(builder: (context) => HomeScreen());
+      // case PPages.noInternet:
+      //   return MaterialPageRoute(builder: (context) => NoInternetWidget());
+
+      default:
+        return null;
+    }
+  }
+}
