@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import '../../../../Service/auth_repository.dart';
-import '../model/register_model.dart';
+
 
 
 class RegisterViewModel extends ChangeNotifier {
@@ -44,34 +44,35 @@ class RegisterViewModel extends ChangeNotifier {
   }
 
   // Registration method
-Future<void> registerUser() async {
-    if (!formKey.currentState!.validate()) return;
+Future<bool> registerUser() async {
+  if (!formKey.currentState!.validate()) return false;
 
-    try {
-      EasyLoading.show(status: 'Registering...');
-      final response = await _authRepository.register(
-        firstName: firstNameController.text.trim(),
-        middleName: middleNameController.text.trim(),
-        lastName: lastNameController.text.trim(),
-        email: emailController.text.trim(),
-        contactNo: numberController.text.trim(),
-        password: passwordController.text.trim(),
-        confirmPassword: confirmPasswordController.text.trim(),
-      );
+  try {
+    EasyLoading.show(status: 'Registering...');
+    final response = await _authRepository.register(
+      firstName: firstNameController.text.trim(),
+      middleName: middleNameController.text.trim(),
+      lastName: lastNameController.text.trim(),
+      email: emailController.text.trim(),
+      contactNo: numberController.text.trim(),
+      password: passwordController.text.trim(),
+      confirmPassword: confirmPasswordController.text.trim(),
+    );
 
-      EasyLoading.dismiss();
-      registerErrorText = null;
+    EasyLoading.dismiss();
+    registerErrorText = null;
+    EasyLoading.showSuccess(response["message"] ?? "User registered successfully");
+    clearData();
 
-      // ✅ Show success
-      EasyLoading.showSuccess(response["message"] ?? "User registered successfully");
-      clearData();
-
-    } catch (e) {
-      EasyLoading.dismiss();
-      registerErrorText = e.toString();
-      EasyLoading.showError(registerErrorText ?? "Something went wrong");
-    }
+    return true; // success
+  } catch (e) {
+    EasyLoading.dismiss();
+    registerErrorText = e.toString();
+    EasyLoading.showError(registerErrorText ?? "Something went wrong");
+    return false;
   }
+}
+
 
 
 

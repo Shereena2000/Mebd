@@ -67,7 +67,8 @@ class RegisterScreen extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: CustomTextFeild(
-                                      controller: viewModel.middleNameController,
+                                      controller:
+                                          viewModel.middleNameController,
                                       hintText: "Middle Name",
                                     ),
                                   ),
@@ -124,7 +125,8 @@ class RegisterScreen extends StatelessWidget {
                                   if (value == null || value.isEmpty) {
                                     return 'Please confirm your password';
                                   }
-                                  if (value != viewModel.passwordController.text) {
+                                  if (value !=
+                                      viewModel.passwordController.text) {
                                     return 'Passwords do not match';
                                   }
                                   return null;
@@ -152,12 +154,39 @@ class RegisterScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                     CustomOutlineButton(
-  onPressed: () {
-    context.read<RegisterViewModel>().registerUser();
-  },
-  text: 'Register',
-),
+                      CustomOutlineButton(
+                        onPressed: () async {
+                          bool success = await context
+                              .read<RegisterViewModel>()
+                              .registerUser();
+                          if (success) {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text("Verify Email"),
+                                content: const Text(
+                                  "We’ve sent a verification link to your email. "
+                                  "Please verify your account before logging in.",
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(ctx);
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        PPages.login,
+                                      );
+                                    },
+                                    child: const Text("Go to Login"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+
+                        text: 'Register',
+                      ),
                       const SizeBoxH(10),
                       AuthNavigationText(
                         text: "Already have an account? ",
