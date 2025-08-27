@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medb/Features/auth/register/view_model/register_view_model.dart';
+import 'package:medb/Settings/utils/p_colors.dart';
 import 'package:medb/Settings/utils/p_pages.dart';
 import 'package:provider/provider.dart';
 import '../../../../Settings/common/custom_outline_button.dart';
@@ -163,10 +164,16 @@ class RegisterScreen extends StatelessWidget {
                             showDialog(
                               context: context,
                               builder: (ctx) => AlertDialog(
-                                title: const Text("Verify Email"),
-                                content: const Text(
+                                backgroundColor: PColors.white,
+                                title: SizedBox(
+                                  width: 70,
+                                  height: 70,
+                                  child: Image.asset(Images.medbIcon),
+                                ),
+                                content: Text(
                                   "We’ve sent a verification link to your email. "
                                   "Please verify your account before logging in.",
+                                  style: PTextStyles.tittleMedium,
                                 ),
                                 actions: [
                                   TextButton(
@@ -177,7 +184,12 @@ class RegisterScreen extends StatelessWidget {
                                         PPages.login,
                                       );
                                     },
-                                    child: const Text("Go to Login"),
+                                    child: Text(
+                                      "Go to Login",
+                                      style: PTextStyles.tittleMedium.copyWith(
+                                        color: PColors.primaryColor,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),

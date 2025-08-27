@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medb/Features/auth/login/view_model/login_view_model.dart';
 import 'package:medb/Settings/utils/p_colors.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer';
 
 import '../../../../Settings/common/custom_outline_button.dart';
 import '../../../../Settings/common/custom_text_feild.dart';
@@ -24,7 +25,7 @@ class LoginScreen extends StatelessWidget {
           child: Consumer<LoginViewModel>(
             builder: (context, viewModel, child) {
               return Form(
-                  key: viewModel.formkey,
+                key: viewModel.formkey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -37,7 +38,6 @@ class LoginScreen extends StatelessWidget {
                       style: PTextStyles.displaMedium.copyWith(fontSize: 25),
                     ),
                     SizeBoxH(30),
-
                     CustomTextFeild(
                       controller: viewModel.emailController,
                       validation: Validator.email,
@@ -71,25 +71,24 @@ class LoginScreen extends StatelessWidget {
                     SizeBoxH(30),
                     CustomOutlineButton(
                       onPressed: () async {
+                        
                         final response = await context
                             .read<LoginViewModel>()
-                            .loginUser();
+                            .loginUser(context);
 
                         if (response != null) {
-                          // ✅ Login success → Navigate to Home
+                          log("✅ Login successful - navigating to home");
+                          
                           Navigator.pushReplacementNamed(
                             context,
-                            PPages.homePageUi,
+                            PPages.mainPageUi,
                           );
-
-                          // Example: you can also save tokens or user details here
-                          print("Access Token: ${response['accessToken']}");
-                          print("Login Key: ${response['loginKey']}");
+                        } else {
+                          log("❌ Login failed - staying on login screen");
                         }
                       },
                       text: 'Login',
                     ),
-
                     SizeBoxH(15),
                     AuthNavigationText(
                       text: "Don't have an account? ",

@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
         highlightColor: Colors.transparent,
         splashColor: Colors.transparent,
-        scaffoldBackgroundColor: PColors.colorFFFFFF,
+        scaffoldBackgroundColor: PColors.scaffoldColor2,
         colorScheme: ColorScheme.fromSeed(seedColor: PColors.primaryColor),
         iconTheme: IconThemeData(color: PColors.lightGrey),
         useMaterial3: true,

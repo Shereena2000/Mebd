@@ -11,6 +11,7 @@ class CustomOutlineButton extends StatelessWidget {
   final double? height;
   final double? borderRaduis;
     final Color? bgcolor;
+        final Color? textcolor;
   final Color? bordercolor;
   final Color? forgcolor;
   final double? padverticle;
@@ -27,7 +28,7 @@ class CustomOutlineButton extends StatelessWidget {
     this.forgcolor,
     this.borderRaduis,
     this.padverticle,
-    this.padhorizondal, this.bgcolor, this.fontSize,
+    this.padhorizondal, this.bgcolor, this.fontSize, this.textcolor,
   });
 
   @override
@@ -55,7 +56,7 @@ class CustomOutlineButton extends StatelessWidget {
         text,
         style: getTextStyle(
           fontSize:fontSize?? 16,
-          color: PColors.colorFFFFFF,
+          color:textcolor?? PColors.colorFFFFFF,
           fontWeight: FontWeight.w600,
         ),
       ),
