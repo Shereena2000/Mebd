@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:medb/Features/auth/login/view/ui.dart';
 import 'package:medb/Features/auth/register/view/ui.dart';
 import 'package:medb/Features/main_screen/view/ui.dart';
 import 'package:medb/Settings/utils/p_pages.dart';
 
+import '../../Features/auth/login/view/ui.dart';
 import '../../Features/splash/view/ui.dart';
 
 class Routes {

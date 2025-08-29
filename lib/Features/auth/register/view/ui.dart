@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medb/Features/auth/login/view/ui.dart';
 import 'package:medb/Features/auth/register/view_model/register_view_model.dart';
 import 'package:medb/Settings/utils/p_colors.dart';
 import 'package:medb/Settings/utils/p_pages.dart';
@@ -9,6 +10,7 @@ import '../../../../Settings/constants/sized_box.dart';
 import '../../../../Settings/utils/images.dart';
 import '../../../../Settings/utils/p_text_styles.dart';
 import '../../../../Settings/utils/validator.dart';
+import '../../../../main.dart';
 import '../../../common_widgets/auth_navigation.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -160,41 +162,47 @@ class RegisterScreen extends StatelessWidget {
                           bool success = await context
                               .read<RegisterViewModel>()
                               .registerUser();
-                          if (success) {
-                            showDialog(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                backgroundColor: PColors.white,
-                                title: SizedBox(
-                                  width: 70,
-                                  height: 70,
-                                  child: Image.asset(Images.medbIcon),
-                                ),
-                                content: Text(
-                                  "We’ve sent a verification link to your email. "
-                                  "Please verify your account before logging in.",
-                                  style: PTextStyles.tittleMedium,
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(ctx);
-                                      Navigator.pushReplacementNamed(
-                                        context,
-                                        PPages.login,
-                                      );
-                                    },
-                                    child: Text(
-                                      "Go to Login",
-                                      style: PTextStyles.tittleMedium.copyWith(
-                                        color: PColors.primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
+                       // Import this at the top of your register screen file:
+// import 'package:medb/main.dart' show navigatorKey;
+
+if (success) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (dialogContext) => AlertDialog(
+      backgroundColor: PColors.white,
+      title: SizedBox(
+        width: 70,
+        height: 70,
+        child: Image.asset(Images.medbIcon),
+      ),
+      content: Text(
+        "We've sent a verification link to your email. "
+        "Please verify your account before logging in.",
+        style: PTextStyles.tittleMedium,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(dialogContext);
+            
+            Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context) =>  LoginScreen()),
+);
+
+          },
+          child: Text(
+            "Go to Login",
+            style: PTextStyles.tittleMedium.copyWith(
+              color: PColors.primaryColor,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
                         },
 
                         text: 'Register',
@@ -205,7 +213,11 @@ class RegisterScreen extends StatelessWidget {
                         buttonText: "Login",
                         onTap: () {
                           if (!viewModel.isLoading) {
-                            Navigator.pushNamed(context, PPages.login);
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            } else {
+                              Navigator.pushNamed(context, PPages.login);
+                            }
                           }
                         },
                       ),

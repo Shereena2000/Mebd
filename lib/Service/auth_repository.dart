@@ -4,6 +4,34 @@ import 'package:http/http.dart' as http;
 
 class AuthRepository {
   final String baseUrl = "https://testapi.medb.co.in/api/auth";
+  
+  // Store cookies for refresh token handling
+  final Map<String, String> _cookies = {};
+
+  // Save cookies from response headers
+  void _saveCookiesFromResponse(http.Response response) {
+    final setCookieHeader = response.headers['set-cookie'];
+    if (setCookieHeader != null) {
+      final cookies = setCookieHeader.split(',');
+      for (final cookie in cookies) {
+        final trimmedCookie = cookie.trim();
+        if (trimmedCookie.contains('=')) {
+          final parts = trimmedCookie.split('=');
+          if (parts.length >= 2) {
+            final name = parts[0].trim();
+            final value = parts[1].split(';')[0].trim();
+            _cookies[name] = value;
+            log("🍪 Saved cookie: $name");
+          }
+        }
+      }
+    }
+  }
+
+  // Get cookie string for requests
+  String _getCookieString() {
+    return _cookies.entries.map((e) => '${e.key}=${e.value}').join('; ');
+  }
 
   Future<Map<String, dynamic>> login({
     required String email,
@@ -32,12 +60,15 @@ class AuthRepository {
       log("📱 Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
+        // Save cookies (including refresh token)
+        _saveCookiesFromResponse(response);
+        
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         
-        // ✅ Extract loginKey from cookies in headers
+        // Extract loginKey from cookies
         String? loginKey = _extractLoginKeyFromCookies(response.headers);
         
-        // ✅ Validate required fields
+        // Validate required fields
         if (responseData['accessToken'] == null) {
           throw Exception("Server response missing accessToken");
         }
@@ -45,7 +76,7 @@ class AuthRepository {
           throw Exception("Server response missing loginKey in cookies");
         }
         
-        // ✅ Add loginKey to response data
+        // Add loginKey to response data
         responseData['loginKey'] = loginKey;
         
         log("✅ Extracted loginKey from cookies: ${loginKey.substring(0, 20)}...");
@@ -64,15 +95,11 @@ class AuthRepository {
       }
     } catch (e) {
       log("❌ Login Exception: $e");
-      if (e is Exception) {
-        rethrow;
-      } else {
-        throw Exception("Network error: $e");
-      }
+      rethrow;
     }
   }
 
-  // ✅ Helper method to extract loginKey from Set-Cookie header
+  // Helper method to extract loginKey from Set-Cookie header
   String? _extractLoginKeyFromCookies(Map<String, String> headers) {
     try {
       final setCookieHeader = headers['set-cookie'];
@@ -80,13 +107,11 @@ class AuthRepository {
       
       log("🍪 Set-Cookie header: $setCookieHeader");
       
-      // Split by comma to get individual cookies
       final cookies = setCookieHeader.split(',');
       
       for (final cookie in cookies) {
         final trimmedCookie = cookie.trim();
         if (trimmedCookie.startsWith('loginKey=')) {
-          // Extract the value between loginKey= and the first semicolon
           final loginKeyPart = trimmedCookie.substring('loginKey='.length);
           final semicolonIndex = loginKeyPart.indexOf(';');
           final loginKey = semicolonIndex != -1 
@@ -106,6 +131,53 @@ class AuthRepository {
     }
   }
 
+  // Refresh access token using refresh token cookie
+  Future<Map<String, dynamic>?> refreshToken() async {
+    try {
+      final url = Uri.parse('$baseUrl/refresh-token');
+      
+      Map<String, String> headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      // Include refresh token cookie
+      final cookieString = _getCookieString();
+      if (cookieString.isNotEmpty) {
+        headers['Cookie'] = cookieString;
+      } else {
+        log("❌ No refresh token cookie available");
+        return null;
+      }
+
+      log("🔄 Attempting token refresh with cookies: $cookieString");
+      
+      final response = await http.post(url, headers: headers);
+      
+      log("🔄 Refresh token response status: ${response.statusCode}");
+      log("🔄 Refresh token response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        // Save new cookies from refresh response
+        _saveCookiesFromResponse(response);
+        
+        final responseData = jsonDecode(response.body);
+        log("✅ Token refreshed successfully");
+        return responseData;
+      } else {
+        log("❌ Token refresh failed with status: ${response.statusCode}");
+        
+        // If refresh fails, clear stored cookies
+        _cookies.clear();
+        return null;
+      }
+    } catch (e) {
+      log("❌ Exception during token refresh: $e");
+      _cookies.clear();
+      return null;
+    }
+  }
+
   Future<Map<String, dynamic>> register({
     required String firstName,
     required String middleName,
@@ -115,55 +187,90 @@ class AuthRepository {
     required String password,
     required String confirmPassword,
   }) async {
-    final url = Uri.parse('$baseUrl/register');
+    try {
+      final url = Uri.parse('$baseUrl/register');
 
-    final response = await http.post(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      body: jsonEncode({
-        "firstName": firstName,
-        "middleName": middleName,
-        "lastName": lastName,
-        "email": email,
-        "contactNo": contactNo,
-        "password": password,
-        "confirmPassword": confirmPassword,
-      }),
-    );
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: jsonEncode({
+          "firstName": firstName,
+          "middleName": middleName,
+          "lastName": lastName,
+          "email": email,
+          "contactNo": contactNo,
+          "password": password,
+          "confirmPassword": confirmPassword,
+        }),
+      );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return jsonDecode(response.body);
-    } else {
-      String errorMessage;
-      try {
-        final errorData = jsonDecode(response.body);
-        errorMessage = errorData["message"] ?? "Registration failed";
-      } catch (e) {
-        errorMessage = "Registration failed with status: ${response.statusCode}";
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        String errorMessage;
+        try {
+          final errorData = jsonDecode(response.body);
+          errorMessage = errorData["message"] ?? "Registration failed";
+        } catch (e) {
+          errorMessage = "Registration failed with status: ${response.statusCode}";
+        }
+        throw Exception(errorMessage);
       }
-      throw Exception(errorMessage);
+    } catch (e) {
+      log("❌ Registration Exception: $e");
+      rethrow;
     }
   }
 
-  Future<void> logout() async {
-    final url = Uri.parse('$baseUrl/logout');
+  Future<Map<String, dynamic>> logout() async {
+    try {
+      final url = Uri.parse('$baseUrl/logout');
 
-    final response = await http.post(
-      url,
-      headers: {
+      Map<String, String> headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
-      },
-    );
+      };
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      log("✅ Logout Success: ${data['message']}");
-    } else {
-      throw Exception("Logout failed: ${response.body}");
+      // Include refresh token cookie for proper logout
+      final cookieString = _getCookieString();
+      if (cookieString.isNotEmpty) {
+        headers['Cookie'] = cookieString;
+      }
+
+      final response = await http.post(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        // Clear stored cookies after successful logout
+        _cookies.clear();
+        
+        log("✅ Logout Success: ${data['message']}");
+        return data;
+      } else {
+        // Even if logout fails on server, clear local cookies
+        _cookies.clear();
+        throw Exception("Logout failed: ${response.body}");
+      }
+    } catch (e) {
+      // Clear cookies even on exception
+      _cookies.clear();
+      log("❌ Logout Exception: $e");
+      rethrow;
     }
+  }
+
+  // Check if refresh token exists
+  bool hasRefreshToken() {
+    return _cookies.containsKey('refreshToken') && _cookies['refreshToken']!.isNotEmpty;
+  }
+
+  // Clear all stored cookies
+  void clearCookies() {
+    _cookies.clear();
+    log("🗑️ All cookies cleared");
   }
 }

@@ -25,7 +25,10 @@ class AuthNavigationText extends StatelessWidget {
           onTap: onTap,
           child: Text(
             buttonText,
-            style: PTextStyles.bodyMedium.copyWith(color: PColors.primaryColor,fontWeight: FontWeight.w600),
+            style: PTextStyles.bodyMedium.copyWith(
+              color: PColors.primaryColor,
+              fontWeight: FontWeight.w600
+            ),
           ),
         ),
       ],

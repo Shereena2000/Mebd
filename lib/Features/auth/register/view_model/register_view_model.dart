@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-
 import '../../../../Service/auth_repository.dart';
 
-
-
 class RegisterViewModel extends ChangeNotifier {
-   final AuthRepository _authRepository = AuthRepository();
+  final AuthRepository _authRepository = AuthRepository();
   final formKey = GlobalKey<FormState>();
   final firstNameController = TextEditingController();
   final middleNameController = TextEditingController();
@@ -43,38 +40,38 @@ class RegisterViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Registration method
-Future<bool> registerUser() async {
-  if (!formKey.currentState!.validate()) return false;
+  // Registration method with better error handling
+  Future<bool> registerUser() async {
+    if (!formKey.currentState!.validate()) return false;
 
-  try {
-    EasyLoading.show(status: 'Registering...');
-    final response = await _authRepository.register(
-      firstName: firstNameController.text.trim(),
-      middleName: middleNameController.text.trim(),
-      lastName: lastNameController.text.trim(),
-      email: emailController.text.trim(),
-      contactNo: numberController.text.trim(),
-      password: passwordController.text.trim(),
-      confirmPassword: confirmPasswordController.text.trim(),
-    );
+    try {
+      isLoading = true; // Set loading state
+      EasyLoading.show(status: 'Registering...');
+      
+      final response = await _authRepository.register(
+        firstName: firstNameController.text.trim(),
+        middleName: middleNameController.text.trim(),
+        lastName: lastNameController.text.trim(),
+        email: emailController.text.trim(),
+        contactNo: numberController.text.trim(),
+        password: passwordController.text.trim(),
+        confirmPassword: confirmPasswordController.text.trim(),
+      );
 
-    EasyLoading.dismiss();
-    registerErrorText = null;
-    EasyLoading.showSuccess(response["message"] ?? "User registered successfully");
-    clearData();
-
-    return true; // success
-  } catch (e) {
-    EasyLoading.dismiss();
-    registerErrorText = e.toString();
-    EasyLoading.showError(registerErrorText ?? "Something went wrong");
-    return false;
+      registerErrorText = null;
+      EasyLoading.showSuccess(response["message"] ?? "User registered successfully");
+      clearData();
+      
+      return true; 
+    } catch (e) {
+      registerErrorText = e.toString();
+      EasyLoading.showError(registerErrorText ?? "Something went wrong");
+      return false;
+    } finally {
+      isLoading = false; // Always reset loading state
+      EasyLoading.dismiss();
+    }
   }
-}
-
-
-
 
   void clearData() {
     firstNameController.clear();

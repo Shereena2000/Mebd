@@ -10,7 +10,7 @@ class SecureStorageService {
   static const String _loginKey = 'loginKey';
   static const String _userDetailsKey = 'userDetails';
 
-  // Save tokens + user details
+  // Save complete login data
   Future<void> saveLoginData({
     required String accessToken,
     required String loginKey,
@@ -37,6 +37,17 @@ class SecureStorageService {
     }
   }
 
+  // Save only access token (useful for refresh token scenarios)
+  Future<void> saveAccessToken(String accessToken) async {
+    try {
+      await _storage.write(key: _accessTokenKey, value: accessToken);
+      log("💾 Access token updated in secure storage");
+    } catch (e) {
+      log("❌ Error saving access token: $e");
+      throw Exception("Failed to save access token: $e");
+    }
+  }
+
   // Getters with better error handling
   Future<String?> getAccessToken() async {
     try {
@@ -51,7 +62,9 @@ class SecureStorageService {
 
   Future<String?> getLoginKey() async {
     try {
-      return await _storage.read(key: _loginKey);
+      final loginKey = await _storage.read(key: _loginKey);
+      log("🔍 Retrieved login key: ${loginKey != null && loginKey.isNotEmpty ? 'Present' : 'Missing'}");
+      return loginKey;
     } catch (e) {
       log("❌ Error retrieving login key: $e");
       return null;
@@ -62,12 +75,34 @@ class SecureStorageService {
     try {
       final data = await _storage.read(key: _userDetailsKey);
       if (data != null && data.isNotEmpty) {
-        return jsonDecode(data);
+        final userDetails = jsonDecode(data);
+        log("👤 Retrieved user details: ${userDetails['firstName'] ?? 'Unknown'}");
+        return userDetails;
       }
+      log("👤 No user details found");
       return null;
     } catch (e) {
       log("❌ Error retrieving user details: $e");
       return null;
+    }
+  }
+
+  // Check if user is logged in (has valid access token)
+  Future<bool> isLoggedIn() async {
+    try {
+      final accessToken = await getAccessToken();
+      final loginKey = await getLoginKey();
+      
+      final isValid = accessToken != null && 
+                     accessToken.isNotEmpty && 
+                     loginKey != null && 
+                     loginKey.isNotEmpty;
+      
+      log("🔍 User login status: ${isValid ? 'Logged in' : 'Not logged in'}");
+      return isValid;
+    } catch (e) {
+      log("❌ Error checking login status: $e");
+      return false;
     }
   }
 
@@ -94,5 +129,16 @@ class SecureStorageService {
     } catch (e) {
       log("❌ Error reading storage: $e");
     }
+  }
+
+  // Check if specific token exists
+  Future<bool> hasAccessToken() async {
+    final token = await getAccessToken();
+    return token != null && token.isNotEmpty;
+  }
+
+  Future<bool> hasLoginKey() async {
+    final key = await getLoginKey();
+    return key != null && key.isNotEmpty;
   }
 }
