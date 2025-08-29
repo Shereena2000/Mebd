@@ -256,74 +256,29 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PColors.primaryColor,
+      backgroundColor: PColors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _scaleAnimation.value,
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Image.asset(
-                        Images.logo,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 30),
-            FadeTransition(
-              opacity: _fadeAnimation,
-              child: const Text(
-                "MedB",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            FadeTransition(
-              opacity: _fadeAnimation,
-              child: const Text(
-                "Your Health, Our Priority",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
-              ),
-            ),
+           SizedBox(
+            width: 250,
+             child: Image.asset(
+                          Images.logo,
+                          fit: BoxFit.contain,
+                        ),
+           ),
+          
+         
             const SizedBox(height: 50),
             FadeTransition(
               opacity: _fadeAnimation,
-              child: const SizedBox(
+              child:  SizedBox(
                 width: 30,
                 height: 30,
                 child: CircularProgressIndicator(
                   strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(PColors.primaryColor),
                 ),
               ),
             ),
